@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "00dff61d-951a-46f9-a40b-9f1ba1b78a9e",
+    "name": "Inscura",
+    "description": "Import movie metadata, people and images from the Inscura local API.",
+    "overview": "Inscura movie metadata provider",
+    "owner": "Inscura",
+    "category": "Metadata",
+    "versions": [
+      {
+        "version": "0.1.0.0",
+        "changelog": "Initial Jellyfin movie metadata provider for the Inscura local API. Matches by real file path and file name first. Remote trailers are limited to YouTube URLs.",
+        "targetAbi": "10.8.12.0",
+        "sourceUrl": "https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_0.1.0.0.zip",
+        "checksum": "538a6e1fab967fa86ea007038a2d3ecd",
+        "timestamp": "2026-07-03T08:59:47Z"
+      }
+    ]
+  }
+]
