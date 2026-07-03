@@ -1,0 +1,115 @@
+name: Release Jellyfin plugin
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_VERSION: "6.0.x"
+  RELEASE_BRANCH: release
+  REPOSITORY_SLUG: InscuraApp/inscura-jellyfin-plugin
+  TARGET_ABI: 10.8.12.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Read plugin version
+        id: version
+        shell: bash
+        run: |
+          version="$(node -e "const fs=require('fs'); const text=fs.readFileSync('Inscura.Jellyfin.Plugin.csproj','utf8'); const match=text.match(/<Version>([^<]+)<\\/Version>/); if (!match) process.exit(1); process.stdout.write(match[1].trim());")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "zip_name=Inscura_${version}.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: |
+          dotnet restore
+          dotnet build -c Release --no-restore
+
+      - name: Package
+        shell: bash
+        run: |
+          package_dir="$RUNNER_TEMP/package"
+          mkdir -p "$package_dir"
+          cp bin/Release/net6.0/Jellyfin.Plugin.Inscura.dll "$package_dir/"
+          (cd "$package_dir" && zip -q -r "$RUNNER_TEMP/${{ steps.version.outputs.zip_name }}" .)
+
+      - name: Verify package contents
+        shell: bash
+        run: |
+          zip_file="$RUNNER_TEMP/${{ steps.version.outputs.zip_name }}"
+          expected="$(mktemp)"
+          actual="$(mktemp)"
+          printf '%s\n' \
+            'Jellyfin.Plugin.Inscura.dll' \
+            | sort > "$expected"
+          unzip -Z1 "$zip_file" | sort > "$actual"
+          if ! diff -u "$expected" "$actual"; then
+            echo "Package contains unexpected files. Only plugin runtime files may be included."
+            exit 1
+          fi
+
+      - name: Prepare release branch
+        shell: bash
+        run: |
+          release_dir="$RUNNER_TEMP/release-branch"
+          if git ls-remote --exit-code --heads origin "$RELEASE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$RELEASE_BRANCH:$RELEASE_BRANCH"
+            git worktree add "$release_dir" "$RELEASE_BRANCH"
+          else
+            git worktree add --detach "$release_dir"
+            git -C "$release_dir" checkout --orphan "$RELEASE_BRANCH"
+            git -C "$release_dir" rm -rf . >/dev/null 2>&1 || true
+            find "$release_dir" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          fi
+
+          mkdir -p "$release_dir/releases"
+          if [ -e "$release_dir/releases/${{ steps.version.outputs.zip_name }}" ]; then
+            echo "Version ${{ steps.version.outputs.version }} already exists on $RELEASE_BRANCH. Bump the csproj version before releasing."
+            exit 1
+          fi
+
+          cp "$RUNNER_TEMP/${{ steps.version.outputs.zip_name }}" "$release_dir/releases/"
+          node scripts/generate-manifest.mjs \
+            --zip "$release_dir/releases/${{ steps.version.outputs.zip_name }}" \
+            --output "$release_dir/manifest.json" \
+            --csproj Inscura.Jellyfin.Plugin.csproj \
+            --repository "$REPOSITORY_SLUG" \
+            --releaseBranch "$RELEASE_BRANCH" \
+            --targetAbi "$TARGET_ABI"
+
+      - name: Publish release branch
+        shell: bash
+        run: |
+          release_dir="$RUNNER_TEMP/release-branch"
+          git -C "$release_dir" config user.name "github-actions[bot]"
+          git -C "$release_dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$release_dir" add manifest.json "releases/${{ steps.version.outputs.zip_name }}"
+          git -C "$release_dir" commit -m "Release Inscura ${{ steps.version.outputs.version }}"
+          git -C "$release_dir" push origin "HEAD:$RELEASE_BRANCH"
+
+      - name: Purge jsDelivr manifest cache
+        continue-on-error: true
+        run: |
+          curl -fsSL "https://purge.jsdelivr.net/gh/${REPOSITORY_SLUG}@${RELEASE_BRANCH}/manifest.json"

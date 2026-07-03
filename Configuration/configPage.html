@@ -1,0 +1,240 @@
+<div id="InscuraConfigPage" data-role="page" class="page type-interior pluginConfigurationPage">
+  <div data-role="content">
+    <div class="content-primary">
+      <form id="InscuraConfigForm">
+        <div class="verticalSection verticalSection-extrabottompadding">
+          <div class="sectionTitleContainer flex align-items-center">
+            <h2 class="sectionTitle">Inscura</h2>
+          </div>
+          <p id="txtIntro"></p>
+          <p id="txtTrailerNotice"></p>
+        </div>
+
+        <div class="selectContainer">
+          <select is="emby-select" id="selectLanguage" label="Language">
+            <option id="languageOptionEn" value="en">English</option>
+            <option id="languageOptionZh" value="zh-CN">简体中文</option>
+          </select>
+        </div>
+
+        <div class="inputContainer">
+          <input is="emby-input" type="url" id="txtApiBaseUrl" label="Inscura API URL" required />
+          <div class="fieldDescription" id="descApiBaseUrl"></div>
+        </div>
+
+        <div class="inputContainer">
+          <input is="emby-input" type="password" id="txtApiToken" label="API Token" />
+          <div class="fieldDescription" id="descApiToken"></div>
+        </div>
+
+        <div class="inputContainer">
+          <input is="emby-input" type="number" id="txtSearchLimit" label="Search result limit" min="1" max="50" step="1" />
+        </div>
+
+        <div class="inputContainer">
+          <input is="emby-input" type="number" id="txtRequestTimeoutSeconds" label="Request timeout (seconds)" min="3" max="120" step="1" />
+        </div>
+
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" id="chkEnableMetadataProvider" />
+          <span id="labelEnableMetadataProvider"></span>
+        </label>
+
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" id="chkEnableImageProvider" />
+          <span id="labelEnableImageProvider"></span>
+        </label>
+
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" id="chkEnableYouTubeTrailers" />
+          <span id="labelEnableYouTubeTrailers"></span>
+        </label>
+
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" id="chkIncludePreviewAsThumb" />
+          <span id="labelIncludePreviewAsThumb"></span>
+        </label>
+
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" id="chkIncludeGalleryBackdrops" />
+          <span id="labelIncludeGalleryBackdrops"></span>
+        </label>
+
+        <div>
+          <button is="emby-button" type="submit" class="raised button-submit block">
+            <span id="labelSave"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    (function () {
+      var pluginId = "00dff61d-951a-46f9-a40b-9f1ba1b78a9e";
+      var languageStorageKey = "jellyfin.plugin.inscura.language";
+      var translations = {
+        en: {
+          language: "Language",
+          english: "English",
+          chinese: "Simplified Chinese",
+          intro: "Import movie metadata, people, and images from the Inscura local API into Jellyfin.",
+          trailerNotice: "Remote trailers are currently imported only when they are YouTube URLs. For local or non-YouTube online trailers, export NFO files from the Inscura App and let Jellyfin scan them.",
+          apiBaseUrl: "Inscura API URL",
+          apiBaseUrlDescription: "Example: http://127.0.0.1:28687",
+          apiToken: "API Token",
+          apiTokenDescription: "Set this only when the Inscura API requires token authentication. Leave it empty when authMode is none.",
+          searchLimit: "Search result limit",
+          requestTimeoutSeconds: "Request timeout (seconds)",
+          enableMetadataProvider: "Enable movie metadata provider",
+          enableImageProvider: "Enable image provider",
+          enableYouTubeTrailers: "Import YouTube trailers",
+          includePreviewAsThumb: "Use Inscura preview images as Thumb candidates",
+          includeGalleryBackdrops: "Use gallery images as Backdrop candidates",
+          save: "Save"
+        },
+        "zh-CN": {
+          language: "界面语言",
+          english: "英文",
+          chinese: "简体中文",
+          intro: "从 Inscura 本地 API 为 Jellyfin 电影库导入元数据、演员和图片。",
+          trailerNotice: "远程预告片当前只导入 YouTube 地址。非 YouTube 本地或在线预告片请通过 Inscura App 的 NFO 功能导出后交给 Jellyfin 扫描。",
+          apiBaseUrl: "Inscura API 地址",
+          apiBaseUrlDescription: "示例：http://127.0.0.1:28687",
+          apiToken: "API Token",
+          apiTokenDescription: "仅当 Inscura API 需要 token 鉴权时填写；authMode 为 none 时可留空。",
+          searchLimit: "搜索候选数量",
+          requestTimeoutSeconds: "请求超时（秒）",
+          enableMetadataProvider: "启用电影元数据刮削",
+          enableImageProvider: "启用图片导入",
+          enableYouTubeTrailers: "导入 YouTube 预告片",
+          includePreviewAsThumb: "将 Inscura 预览图作为 Thumb 图片候选",
+          includeGalleryBackdrops: "将图库照片作为 Backdrop 图片候选",
+          save: "保存"
+        }
+      };
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function getStoredLanguage() {
+        try {
+          return localStorage.getItem(languageStorageKey);
+        } catch (err) {
+          return null;
+        }
+      }
+
+      function storeLanguage(language) {
+        try {
+          localStorage.setItem(languageStorageKey, language);
+        } catch (err) {
+        }
+      }
+
+      function normalizeLanguage(language) {
+        return language && language.toLowerCase().indexOf("zh") === 0 ? "zh-CN" : "en";
+      }
+
+      function getInitialLanguage() {
+        var storedLanguage = getStoredLanguage();
+        if (storedLanguage === "en" || storedLanguage === "zh-CN") {
+          return storedLanguage;
+        }
+
+        var browserLanguages = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+        return normalizeLanguage(browserLanguages[0]);
+      }
+
+      function setText(id, value) {
+        var element = byId(id);
+        if (element) {
+          element.textContent = value;
+        }
+      }
+
+      function setInputLabel(id, value) {
+        var element = byId(id);
+        if (!element) {
+          return;
+        }
+
+        element.setAttribute("label", value);
+        element.label = value;
+      }
+
+      function applyLanguage(language) {
+        var activeLanguage = language === "zh-CN" ? "zh-CN" : "en";
+        var text = translations[activeLanguage];
+
+        setInputLabel("selectLanguage", text.language);
+        byId("selectLanguage").value = activeLanguage;
+        setText("languageOptionEn", text.english);
+        setText("languageOptionZh", text.chinese);
+        setText("txtIntro", text.intro);
+        setText("txtTrailerNotice", text.trailerNotice);
+        setInputLabel("txtApiBaseUrl", text.apiBaseUrl);
+        setText("descApiBaseUrl", text.apiBaseUrlDescription);
+        setInputLabel("txtApiToken", text.apiToken);
+        setText("descApiToken", text.apiTokenDescription);
+        setInputLabel("txtSearchLimit", text.searchLimit);
+        setInputLabel("txtRequestTimeoutSeconds", text.requestTimeoutSeconds);
+        setText("labelEnableMetadataProvider", text.enableMetadataProvider);
+        setText("labelEnableImageProvider", text.enableImageProvider);
+        setText("labelEnableYouTubeTrailers", text.enableYouTubeTrailers);
+        setText("labelIncludePreviewAsThumb", text.includePreviewAsThumb);
+        setText("labelIncludeGalleryBackdrops", text.includeGalleryBackdrops);
+        setText("labelSave", text.save);
+      }
+
+      function loadConfiguration(page) {
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+          byId("txtApiBaseUrl").value = config.ApiBaseUrl || "http://127.0.0.1:28687";
+          byId("txtApiToken").value = config.ApiToken || "";
+          byId("txtSearchLimit").value = config.SearchLimit || 10;
+          byId("txtRequestTimeoutSeconds").value = config.RequestTimeoutSeconds || 15;
+          byId("chkEnableMetadataProvider").checked = config.EnableMetadataProvider !== false;
+          byId("chkEnableImageProvider").checked = config.EnableImageProvider !== false;
+          byId("chkEnableYouTubeTrailers").checked = config.EnableYouTubeTrailers !== false;
+          byId("chkIncludePreviewAsThumb").checked = config.IncludePreviewAsThumb !== false;
+          byId("chkIncludeGalleryBackdrops").checked = config.IncludeGalleryBackdrops !== false;
+          Dashboard.hideLoadingMsg();
+        });
+      }
+
+      document.querySelector("#InscuraConfigPage").addEventListener("pageshow", function () {
+        applyLanguage(getInitialLanguage());
+        loadConfiguration(this);
+      });
+
+      document.querySelector("#selectLanguage").addEventListener("change", function () {
+        var language = this.value === "zh-CN" ? "zh-CN" : "en";
+        storeLanguage(language);
+        applyLanguage(language);
+      });
+
+      document.querySelector("#InscuraConfigForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+          config.ApiBaseUrl = byId("txtApiBaseUrl").value;
+          config.ApiToken = byId("txtApiToken").value;
+          config.SearchLimit = parseInt(byId("txtSearchLimit").value || "10", 10);
+          config.RequestTimeoutSeconds = parseInt(byId("txtRequestTimeoutSeconds").value || "15", 10);
+          config.EnableMetadataProvider = byId("chkEnableMetadataProvider").checked;
+          config.EnableImageProvider = byId("chkEnableImageProvider").checked;
+          config.EnableYouTubeTrailers = byId("chkEnableYouTubeTrailers").checked;
+          config.IncludePreviewAsThumb = byId("chkIncludePreviewAsThumb").checked;
+          config.IncludeGalleryBackdrops = byId("chkIncludeGalleryBackdrops").checked;
+
+          ApiClient.updatePluginConfiguration(pluginId, config).then(function () {
+            Dashboard.processPluginConfigurationUpdateResult();
+          });
+        });
+        return false;
+      });
+    })();
+  </script>
+</div>
