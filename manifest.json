@@ -8,20 +8,12 @@
     "category": "Metadata",
     "versions": [
       {
-        "version": "0.1.0.1",
+        "version": "0.1.0.0",
         "changelog": "Upgrade to Jellyfin 10.11.11 / .NET 9. Add person metadata and image providers.",
         "targetAbi": "10.11.11.0",
-        "sourceUrl": "https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_0.1.0.1.zip",
-        "checksum": "e1ddbf7d3cf8e01d0fe899f670f7c13a",
-        "timestamp": "2026-07-04T11:17:06Z"
-      },
-      {
-        "version": "0.1.0.0",
-        "changelog": "Initial Jellyfin movie metadata provider for the Inscura local API. Matches by real file path and file name first. Remote trailers are limited to YouTube URLs.",
-        "targetAbi": "10.8.12.0",
         "sourceUrl": "https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_0.1.0.0.zip",
-        "checksum": "538a6e1fab967fa86ea007038a2d3ecd",
-        "timestamp": "2026-07-03T08:59:47Z"
+        "checksum": "d7706dc733deaac5c57620be3881a89f",
+        "timestamp": "2026-07-04T11:24:19Z"
       }
     ]
   }
