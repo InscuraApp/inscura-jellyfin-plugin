@@ -90,6 +90,7 @@ jobs:
           fi
 
           cp "$RUNNER_TEMP/${{ steps.version.outputs.zip_name }}" "$release_dir/releases/"
+          find "$release_dir/releases" -type f -name 'Inscura_*.zip' ! -name '${{ steps.version.outputs.zip_name }}' -delete
           node scripts/generate-manifest.mjs \
             --zip "$release_dir/releases/${{ steps.version.outputs.zip_name }}" \
             --output "$release_dir/manifest.json" \
@@ -104,7 +105,7 @@ jobs:
           release_dir="$RUNNER_TEMP/release-branch"
           git -C "$release_dir" config user.name "github-actions[bot]"
           git -C "$release_dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$release_dir" add manifest.json "releases/${{ steps.version.outputs.zip_name }}"
+          git -C "$release_dir" add manifest.json releases/
           git -C "$release_dir" commit -m "Release Inscura ${{ steps.version.outputs.version }}"
           git -C "$release_dir" push origin "HEAD:$RELEASE_BRANCH"
 

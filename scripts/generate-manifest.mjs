@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFile, stat, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
 
 const plugin = {
   guid: "00dff61d-951a-46f9-a40b-9f1ba1b78a9e",
@@ -30,7 +29,6 @@ async function main() {
   const zip = requireArg(args.zip, "zip");
   const version = await readVersion(csproj);
   const checksum = await md5(zip);
-  const existingManifest = await readExistingManifest(output);
 
   const versionEntry = {
     version,
@@ -41,7 +39,7 @@ async function main() {
     timestamp: new Date().toISOString().replace(/\.\d{3}Z$/, "Z")
   };
 
-  const versions = [versionEntry, ...existingManifest.versions.filter(item => item.version !== version)];
+  const versions = [versionEntry];
   const manifest = [
     {
       ...plugin,
@@ -94,25 +92,6 @@ async function readVersion(csproj) {
 async function md5(filePath) {
   const file = await readFile(filePath);
   return createHash("md5").update(file).digest("hex");
-}
-
-async function readExistingManifest(output) {
-  try {
-    await stat(output);
-  } catch {
-    return { versions: [] };
-  }
-
-  const content = await readFile(output, "utf8");
-  if (!content.trim()) {
-    return { versions: [] };
-  }
-
-  const parsed = JSON.parse(content);
-  const first = Array.isArray(parsed) ? parsed[0] : null;
-  return {
-    versions: Array.isArray(first?.versions) ? first.versions : []
-  };
 }
 
 main().catch(error => {
