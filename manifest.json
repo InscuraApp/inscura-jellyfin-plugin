@@ -12,8 +12,8 @@
         "changelog": "Upgrade to Jellyfin 10.11.11 / .NET 9. Add person metadata and image providers.",
         "targetAbi": "10.11.11.0",
         "sourceUrl": "https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_0.1.0.1.zip",
-        "checksum": "90481791b965b44fdd54fbc1707f4267",
-        "timestamp": "2026-07-04T11:10:26Z"
+        "checksum": "e1ddbf7d3cf8e01d0fe899f670f7c13a",
+        "timestamp": "2026-07-04T11:17:06Z"
       },
       {
         "version": "0.1.0.0",
