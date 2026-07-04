@@ -39,7 +39,7 @@ The local API service runs for the duration of the current media library’s lif
 
 ## Recommended Installation Method: Plugin Repository
 
-With this method, Jellyfin reads the `manifest.json` from the plugin repository, making installation and subsequent upgrades more convenient. For users in mainland China, we recommend using the jsDelivr URL.
+With this method, Jellyfin reads the `manifest.json` from the plugin repository, making installation and subsequent upgrades more convenient. Use the GitHub URL by default; if GitHub is slow or unreachable from your network, use the jsDelivr mirror for mainland China.
 
 Repository Name:
 
@@ -47,7 +47,19 @@ Repository Name:
 Inscura
 ```
 
-Repository URL:
+Repository URL (GitHub, recommended):
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/manifest.json
+```
+
+View manifest on GitHub:
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/manifest.json
+```
+
+Mirror for mainland China (jsDelivr):
 
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.json
@@ -60,12 +72,10 @@ Installation Steps:
 3. Go to Repositories.
 4. Click Add.
 5. Enter `Inscura` as the name.
-6. Enter the jsDelivr manifest URL listed above.
+6. Enter the GitHub raw manifest URL listed above. If you are in mainland China and GitHub is unreachable, use the jsDelivr mirror instead.
 7. After saving, go to the Plugins directory or Catalog.
 8. Locate `Inscura` and install it.
 9. Restart Jellyfin.
-
-If your network has stable access to GitHub, you can also use the manifest file from the `release` branch; however, for users in Mainland China, we recommend using the jsDelivr URL provided above.
 
 ## Alternative Installation Method: Directly Download the ZIP File
 
@@ -75,6 +85,20 @@ If you cannot install the plugin via the Jellyfin plugin repository, you can man
 
 Open the manifest file:
 
+GitHub (recommended):
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/manifest.json
+```
+
+View manifest on GitHub:
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/manifest.json
+```
+
+Mirror for mainland China (jsDelivr):
+
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.json
 ```
@@ -82,6 +106,20 @@ https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.
 Copy the latest version of `sourceUrl` from the list and download the corresponding ZIP file.
 
 The current release URL format is similar to:
+
+GitHub:
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/releases/Inscura_[version].zip
+```
+
+View release file on GitHub:
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/releases/Inscura_[version].zip
+```
+
+Mirror for mainland China (jsDelivr):
 
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_[version].zip

@@ -86,8 +86,7 @@ jobs:
 
           mkdir -p "$release_dir/releases"
           if [ -e "$release_dir/releases/${{ steps.version.outputs.zip_name }}" ]; then
-            echo "Version ${{ steps.version.outputs.version }} already exists on $RELEASE_BRANCH. Bump the csproj version before releasing."
-            exit 1
+            echo "Overwriting existing release ${{ steps.version.outputs.version }} on $RELEASE_BRANCH."
           fi
 
           cp "$RUNNER_TEMP/${{ steps.version.outputs.zip_name }}" "$release_dir/releases/"
@@ -113,3 +112,4 @@ jobs:
         continue-on-error: true
         run: |
           curl -fsSL "https://purge.jsdelivr.net/gh/${REPOSITORY_SLUG}@${RELEASE_BRANCH}/manifest.json"
+          curl -fsSL "https://purge.jsdelivr.net/gh/${REPOSITORY_SLUG}@${RELEASE_BRANCH}/releases/${{ steps.version.outputs.zip_name }}"

@@ -39,7 +39,7 @@ http://[ip]:28687
 
 ## 推荐安装方式：插件仓库
 
-这种方式由 Jellyfin 读取插件仓库的 `manifest.json`，安装和后续升级都更方便。中国大陆网络环境建议使用 jsDelivr 地址。
+这种方式由 Jellyfin 读取插件仓库的 `manifest.json`，安装和后续升级都更方便。默认使用 GitHub 地址；如果所在网络访问 GitHub 较慢或不可达，可使用面向中国大陆的 jsDelivr 备用地址。
 
 仓库名称：
 
@@ -47,7 +47,19 @@ http://[ip]:28687
 Inscura
 ```
 
-仓库 URL：
+仓库 URL（GitHub，推荐）：
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/manifest.json
+```
+
+在 GitHub 上查看 manifest：
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/manifest.json
+```
+
+中国大陆备用（jsDelivr）：
 
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.json
@@ -60,12 +72,10 @@ https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.
 3. 进入存储库或 Repositories。
 4. 点击添加。
 5. 名称填写 `Inscura`。
-6. URL 填写上面的 jsDelivr manifest 地址。
+6. URL 填写上面的 GitHub raw manifest 地址。如果在中国大陆且 GitHub 不可达，可改用 jsDelivr 备用地址。
 7. 保存后进入插件目录或 Catalog。
 8. 找到 `Inscura` 并安装。
 9. 重启 Jellyfin。
-
-如果你的网络可以稳定访问 GitHub，也可以使用 release 分支中的 manifest 文件；但面向中国大陆环境，优先使用上面的 jsDelivr 地址。
 
 ## 备用安装方式：直接下载 zip
 
@@ -75,6 +85,20 @@ https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.
 
 打开 manifest 文件：
 
+GitHub（推荐）：
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/manifest.json
+```
+
+在 GitHub 上查看 manifest：
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/manifest.json
+```
+
+中国大陆备用（jsDelivr）：
+
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.json
 ```
@@ -82,6 +106,20 @@ https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.
 复制其中最新版本的 `sourceUrl`，下载对应的 zip 文件。
 
 当前发布文件的地址格式类似：
+
+GitHub：
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/releases/Inscura_[版本号].zip
+```
+
+在 GitHub 上查看发布文件：
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/releases/Inscura_[版本号].zip
+```
+
+中国大陆备用（jsDelivr）：
 
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_[版本号].zip

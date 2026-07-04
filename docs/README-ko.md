@@ -39,7 +39,7 @@ http://[ip]:28687
 
 ## 권장 설치 방법: 플러그인 저장소
 
-이 방법은 Jellyfin이 플러그인 저장소의 `manifest.json`을 읽어오므로, 설치 및 후속 업그레이드가 더 편리합니다. 중국 본토의 네트워크 환경에서는 jsDelivr 주소를 사용하는 것이 좋습니다.
+이 방법은 Jellyfin이 플러그인 저장소의 `manifest.json`을 읽어오므로, 설치 및 후속 업그레이드가 더 편리합니다. 기본적으로 GitHub 주소를 사용하세요. GitHub 접속이 느리거나 불가능한 경우, 중국 본토용 jsDelivr 미러 주소를 사용하세요.
 
 저장소 이름:
 
@@ -47,7 +47,19 @@ http://[ip]:28687
 Inscura
 ```
 
-저장소 URL:
+저장소 URL(GitHub, 권장):
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/manifest.json
+```
+
+GitHub에서 manifest 보기:
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/manifest.json
+```
+
+중국 본토용 미러(jsDelivr):
 
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.json
@@ -60,12 +72,10 @@ https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.
 3. 저장소(Repositories)로 이동합니다.
 4. ‘추가’를 클릭합니다.
 5. 이름에 `Inscura`을 입력합니다.
-6. URL에 위의 jsDelivr 매니페스트 주소를 입력합니다.
+6. URL에 위의 GitHub raw manifest 주소를 입력합니다. 중국 본토에서 GitHub에 접속할 수 없다면 jsDelivr 미러 주소를 사용하세요.
 7. 저장한 후 플러그인 목록 또는 Catalog로 이동합니다.
 8. `Inscura`을 찾아 설치합니다.
 9. Jellyfin을 재시작합니다.
-
-GitHub에 안정적으로 접속할 수 있는 경우, release 브랜치의 매니페스트 파일을 사용할 수도 있습니다. 단, 중국 본토 환경에서는 위의 jsDelivr 주소를 우선적으로 사용하십시오.
 
 ## 대체 설치 방법: zip 파일 직접 다운로드
 
@@ -75,6 +85,20 @@ Jellyfin에서 플러그인 저장소를 통해 설치할 수 없는 경우, 플
 
 manifest 파일을 엽니다:
 
+GitHub(권장):
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/manifest.json
+```
+
+GitHub에서 manifest 보기:
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/manifest.json
+```
+
+중국 본토용 미러(jsDelivr):
+
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.json
 ```
@@ -82,6 +106,20 @@ https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/manifest.
 그중 최신 버전인 `sourceUrl`을 복사한 후, 해당 zip 파일을 다운로드합니다.
 
 현재 공개된 파일의 주소 형식은 다음과 같습니다:
+
+GitHub:
+
+```text
+https://raw.githubusercontent.com/InscuraApp/inscura-jellyfin-plugin/release/releases/Inscura_[버전].zip
+```
+
+GitHub에서 공개 파일 보기:
+
+```text
+https://github.com/InscuraApp/inscura-jellyfin-plugin/blob/release/releases/Inscura_[버전].zip
+```
+
+중국 본토용 미러(jsDelivr):
 
 ```text
 https://cdn.jsdelivr.net/gh/InscuraApp/inscura-jellyfin-plugin@release/releases/Inscura_[버전].zip
