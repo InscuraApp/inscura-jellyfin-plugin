@@ -151,3 +151,114 @@ public sealed class ApiRole
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 }
+
+public sealed class ApiActorSearchItem
+{
+    [JsonPropertyName("id")]
+    public long Id { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("slug")]
+    public string? Slug { get; set; }
+
+    [JsonPropertyName("sortOrder")]
+    public int? SortOrder { get; set; }
+
+    [JsonPropertyName("isScraped")]
+    public int? IsScraped { get; set; }
+
+    [JsonPropertyName("createdAt")]
+    public long? CreatedAt { get; set; }
+
+    [JsonPropertyName("updatedAt")]
+    public long? UpdatedAt { get; set; }
+
+    [JsonPropertyName("mediaCount")]
+    public long? MediaCount { get; set; }
+
+    [JsonPropertyName("metas")]
+    public Dictionary<string, List<string>> Metas { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [JsonPropertyName("terms")]
+    public Dictionary<string, List<ApiTerm>> Terms { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [JsonPropertyName("assets")]
+    public List<ApiMediaAsset> Assets { get; set; } = new();
+}
+
+public sealed class ApiActorDetail
+{
+    [JsonPropertyName("id")]
+    public long Id { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("slug")]
+    public string? Slug { get; set; }
+
+    [JsonPropertyName("sortOrder")]
+    public int? SortOrder { get; set; }
+
+    [JsonPropertyName("isScraped")]
+    public int? IsScraped { get; set; }
+
+    [JsonPropertyName("createdAt")]
+    public long? CreatedAt { get; set; }
+
+    [JsonPropertyName("updatedAt")]
+    public long? UpdatedAt { get; set; }
+
+    [JsonPropertyName("mediaCount")]
+    public long? MediaCount { get; set; }
+
+    [JsonPropertyName("castMediaCount")]
+    public long? CastMediaCount { get; set; }
+
+    [JsonPropertyName("crewMediaCount")]
+    public long? CrewMediaCount { get; set; }
+
+    [JsonPropertyName("rating")]
+    public double? Rating { get; set; }
+
+    [JsonPropertyName("metas")]
+    public Dictionary<string, string?> Metas { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [JsonPropertyName("terms")]
+    public Dictionary<string, List<ApiTerm>> Terms { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [JsonPropertyName("providerIdentities")]
+    public List<ApiActorProviderIdentity> ProviderIdentities { get; set; } = new();
+
+    [JsonPropertyName("assets")]
+    public List<ApiMediaAsset> Assets { get; set; } = new();
+}
+
+public sealed class ApiActorProviderIdentity
+{
+    [JsonPropertyName("id")]
+    public long Id { get; set; }
+
+    [JsonPropertyName("actorId")]
+    public long ActorId { get; set; }
+
+    [JsonPropertyName("scraperPluginId")]
+    public string? ScraperPluginId { get; set; }
+
+    [JsonPropertyName("providerId")]
+    public string? ProviderId { get; set; }
+
+    [JsonPropertyName("providerActorId")]
+    public string? ProviderActorId { get; set; }
+
+    [JsonPropertyName("displayName")]
+    public string? DisplayName { get; set; }
+
+    [JsonPropertyName("createdAt")]
+    public long? CreatedAt { get; set; }
+
+    [JsonPropertyName("updatedAt")]
+    public long? UpdatedAt { get; set; }
+}

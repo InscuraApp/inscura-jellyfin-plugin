@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Jellyfin.Plugin.Inscura.Api;
+using Jellyfin.Data.Enums;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Model.Entities;
@@ -37,6 +38,40 @@ internal static partial class InscuraMapping
         return result;
     }
 
+    public static RemoteSearchResult ToActorSearchResult(ApiActorSearchItem item, string providerName, InscuraApiClient client)
+    {
+        var birthday = GetFirstSearchMeta(item, "birthday");
+        var result = new RemoteSearchResult
+        {
+            Name = item.Name?.Trim() ?? string.Empty,
+            Overview = GetFirstSearchMeta(item, "description"),
+            PremiereDate = ParseDate(birthday),
+            ProductionYear = ParseYear(birthday),
+            ImageUrl = client.AddQueryTokenIfNeeded(GetFirstAssetUrl(item.Assets, "avatar")),
+            SearchProviderName = providerName
+        };
+
+        result.ProviderIds[Plugin.PersonProviderId] = item.Id.ToString(CultureInfo.InvariantCulture);
+        return result;
+    }
+
+    public static RemoteSearchResult ToActorSearchResult(ApiActorDetail detail, string providerName, InscuraApiClient client)
+    {
+        var birthday = GetMeta(detail, "birthday");
+        var result = new RemoteSearchResult
+        {
+            Name = detail.Name?.Trim() ?? string.Empty,
+            Overview = BuildActorOverview(detail),
+            PremiereDate = ParseDate(birthday),
+            ProductionYear = ParseYear(birthday),
+            ImageUrl = client.AddQueryTokenIfNeeded(GetFirstAssetUrl(detail.Assets, "avatar")),
+            SearchProviderName = providerName
+        };
+
+        result.ProviderIds[Plugin.PersonProviderId] = detail.Id.ToString(CultureInfo.InvariantCulture);
+        return result;
+    }
+
     public static Movie ToMovie(ApiMediaDetail detail)
     {
         var title = GetMeta(detail, "title");
@@ -67,6 +102,26 @@ internal static partial class InscuraMapping
         return movie;
     }
 
+    public static Person ToPerson(ApiActorDetail detail)
+    {
+        var birthday = GetMeta(detail, "birthday");
+        var nationality = GetMeta(detail, "nationality");
+        var person = new Person
+        {
+            Name = detail.Name?.Trim() ?? string.Empty,
+            Overview = BuildActorOverview(detail),
+            HomePageUrl = GetActorHomePage(detail),
+            PremiereDate = ParseDate(birthday),
+            ProductionYear = ParseYear(birthday),
+            CommunityRating = detail.Rating.HasValue ? (float)detail.Rating.Value : null,
+            Tags = GetTermNames(detail, "actor_tag").ToArray(),
+            ProductionLocations = string.IsNullOrWhiteSpace(nationality) ? Array.Empty<string>() : new[] { nationality.Trim() }
+        };
+
+        person.ProviderIds[Plugin.PersonProviderId] = detail.Id.ToString(CultureInfo.InvariantCulture);
+        return person;
+    }
+
     public static IEnumerable<PersonInfo> GetPeople(ApiMediaDetail detail, InscuraApiClient client)
     {
         foreach (var credit in detail.Credits.Cast.OrderBy(credit => credit.SortOrder ?? int.MaxValue))
@@ -80,7 +135,7 @@ internal static partial class InscuraMapping
             {
                 Name = credit.ActorName.Trim(),
                 Role = string.Join(", ", credit.Roles.Select(role => role.Name).Where(value => !string.IsNullOrWhiteSpace(value))),
-                Type = PersonType.Actor,
+                Type = PersonKind.Actor,
                 SortOrder = credit.SortOrder,
                 ImageUrl = client.AddQueryTokenIfNeeded(credit.ActorAvatar?.Url ?? string.Empty)
             };
@@ -154,6 +209,21 @@ internal static partial class InscuraMapping
         };
     }
 
+    public static ImageType? MapActorImageType(ApiMediaAsset asset)
+    {
+        if (string.IsNullOrWhiteSpace(asset.Kind))
+        {
+            return null;
+        }
+
+        return asset.Kind.Trim().ToLowerInvariant() switch
+        {
+            "avatar" => ImageType.Primary,
+            "photo" => ImageType.Profile,
+            _ => null
+        };
+    }
+
     public static string ExtractSearchCode(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -186,6 +256,11 @@ internal static partial class InscuraMapping
     }
 
     public static string GetMeta(ApiMediaDetail detail, string key)
+    {
+        return detail.Metas.TryGetValue(key, out var value) ? value ?? string.Empty : string.Empty;
+    }
+
+    public static string GetMeta(ApiActorDetail detail, string key)
     {
         return detail.Metas.TryGetValue(key, out var value) ? value ?? string.Empty : string.Empty;
     }
@@ -223,6 +298,50 @@ internal static partial class InscuraMapping
         }
     }
 
+    private static IEnumerable<string> GetTermNames(ApiActorDetail detail, params string[] names)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var key in names)
+        {
+            if (!detail.Terms.TryGetValue(key, out var terms))
+            {
+                continue;
+            }
+
+            foreach (var term in terms)
+            {
+                if (!string.IsNullOrWhiteSpace(term.Name) && set.Add(term.Name.Trim()))
+                {
+                    yield return term.Name.Trim();
+                }
+            }
+        }
+    }
+
+    private static string BuildActorOverview(ApiActorDetail detail)
+    {
+        return GetMeta(detail, "description").Trim();
+    }
+
+    private static string GetActorHomePage(ApiActorDetail detail)
+    {
+        var value = FirstMeta(detail, "source_url", "homepage");
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        foreach (var pair in detail.Metas)
+        {
+            if (pair.Key.EndsWith(":homepage", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(pair.Value))
+            {
+                return pair.Value.Trim();
+            }
+        }
+
+        return string.Empty;
+    }
+
     private static string FirstMeta(ApiMediaDetail detail, IEnumerable<string> keys)
     {
         foreach (var key in keys)
@@ -235,6 +354,30 @@ internal static partial class InscuraMapping
         }
 
         return string.Empty;
+    }
+
+    private static string FirstMeta(ApiActorDetail detail, params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            var value = GetMeta(detail, key);
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetFirstSearchMeta(ApiActorSearchItem item, string key)
+    {
+        if (!item.Metas.TryGetValue(key, out var values))
+        {
+            return string.Empty;
+        }
+
+        return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim() ?? string.Empty;
     }
 
     private static string GetFirstAssetUrl(IEnumerable<ApiMediaAsset> assets, string kind)
@@ -309,33 +452,33 @@ internal static partial class InscuraMapping
         return float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result) ? result : null;
     }
 
-    private static string MapPersonKind(IEnumerable<string> roles)
+    private static PersonKind MapPersonKind(IEnumerable<string> roles)
     {
         foreach (var role in roles)
         {
             var normalized = role.Trim().ToLowerInvariant();
             if (normalized.Contains("director", StringComparison.Ordinal))
             {
-                return PersonType.Director;
+                return PersonKind.Director;
             }
 
             if (normalized.Contains("writer", StringComparison.Ordinal) || normalized.Contains("screenplay", StringComparison.Ordinal))
             {
-                return PersonType.Writer;
+                return PersonKind.Writer;
             }
 
             if (normalized.Contains("producer", StringComparison.Ordinal))
             {
-                return PersonType.Producer;
+                return PersonKind.Producer;
             }
 
             if (normalized.Contains("composer", StringComparison.Ordinal) || normalized.Contains("music", StringComparison.Ordinal))
             {
-                return PersonType.Composer;
+                return PersonKind.Composer;
             }
         }
 
-        return string.Empty;
+        return PersonKind.Unknown;
     }
 
     private static void AddTrailerMetaIfYouTube(ApiMediaDetail detail, ICollection<string> urls)

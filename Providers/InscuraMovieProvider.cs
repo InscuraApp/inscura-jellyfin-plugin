@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.Inscura.Api;
 using Jellyfin.Plugin.Inscura.Configuration;
+using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
@@ -83,7 +84,8 @@ public sealed class InscuraMovieProvider : IRemoteMetadataProvider<Movie, MovieI
 
         result.HasMetadata = true;
         result.Item = movie;
-        result.People = InscuraMapping.GetPeople(detail, _apiClient).ToList();
+        IReadOnlyList<PersonInfo> people = InscuraMapping.GetPeople(detail, _apiClient).ToArray();
+        result.People = people;
         return result;
     }
 

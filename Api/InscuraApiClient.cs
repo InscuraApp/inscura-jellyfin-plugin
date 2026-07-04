@@ -40,6 +40,23 @@ public sealed class InscuraApiClient
         return await GetAsync<ApiMediaDetail>("api/v1/media/" + id.ToString(CultureInfo.InvariantCulture), cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<IReadOnlyList<ApiActorSearchItem>> SearchActorsAsync(string query, int limit, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return Array.Empty<ApiActorSearchItem>();
+        }
+
+        var path = "api/v1/actors/search?q=" + Uri.EscapeDataString(query.Trim()) + "&limit=" + ClampLimit(limit).ToString(CultureInfo.InvariantCulture);
+        var results = await GetAsync<List<ApiActorSearchItem>>(path, cancellationToken).ConfigureAwait(false);
+        return results ?? new List<ApiActorSearchItem>();
+    }
+
+    public async Task<ApiActorDetail?> GetActorAsync(long id, CancellationToken cancellationToken)
+    {
+        return await GetAsync<ApiActorDetail>("api/v1/actors/" + id.ToString(CultureInfo.InvariantCulture), cancellationToken).ConfigureAwait(false);
+    }
+
     public Task<HttpResponseMessage> GetImageResponseAsync(string url, CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, url);

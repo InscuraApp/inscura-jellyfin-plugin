@@ -14,8 +14,8 @@ const plugin = {
 const defaults = {
   repository: "InscuraApp/inscura-jellyfin-plugin",
   releaseBranch: "release",
-  targetAbi: "10.8.12.0",
-  changelog: "Initial Jellyfin movie metadata provider for the Inscura local API. Matches by real file path and file name first. Remote trailers are limited to YouTube URLs.",
+  targetAbi: "10.11.11.0",
+  changelog: "Initial Jellyfin metadata provider for the Inscura local API. Matches by real file path and file name first, imports movie and actor metadata, and maps actor_tag terms to Jellyfin person tags.",
   csproj: "Inscura.Jellyfin.Plugin.csproj"
 };
 
