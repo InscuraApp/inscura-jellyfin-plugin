@@ -15,7 +15,7 @@ const defaults = {
   repository: "InscuraApp/inscura-jellyfin-plugin",
   releaseBranch: "release",
   targetAbi: "10.11.11.0",
-  changelog: "Initial Jellyfin metadata provider for the Inscura local API. Matches by real file path and file name first, imports movie and actor metadata, and maps actor_tag terms to Jellyfin person tags.",
+  changelog: "Upgrade to Jellyfin 10.11.11 / .NET 9. Add person metadata and image providers.",
   csproj: "Inscura.Jellyfin.Plugin.csproj"
 };
 
