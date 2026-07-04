@@ -9,10 +9,10 @@ permissions:
   contents: write
 
 env:
-  DOTNET_VERSION: "6.0.x"
+  DOTNET_VERSION: "9.0.x"
   RELEASE_BRANCH: release
   REPOSITORY_SLUG: InscuraApp/inscura-jellyfin-plugin
-  TARGET_ABI: 10.8.12.0
+  TARGET_ABI: 10.11.11.0
 
 jobs:
   release:
@@ -52,7 +52,7 @@ jobs:
         run: |
           package_dir="$RUNNER_TEMP/package"
           mkdir -p "$package_dir"
-          cp bin/Release/net6.0/Jellyfin.Plugin.Inscura.dll "$package_dir/"
+          cp bin/Release/net9.0/Jellyfin.Plugin.Inscura.dll "$package_dir/"
           (cd "$package_dir" && zip -q -r "$RUNNER_TEMP/${{ steps.version.outputs.zip_name }}" .)
 
       - name: Verify package contents
